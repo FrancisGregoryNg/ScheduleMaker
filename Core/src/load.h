@@ -1,5 +1,12 @@
 #pragma once
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <iterator>
+
 void test(int x);
 
 struct DayAndTimeCombo
@@ -14,7 +21,7 @@ class Entry
 public:
 	enum DayOfWeek : char
 	{
-		Sunday = 1, Monday = 2, Tuesday = 3, Wednesday = 4, Thursday = 5, Friday = 6, Saturday = 7
+		Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
 	};
 	enum Time : int
 	{
@@ -43,17 +50,52 @@ public:
 		_1000pm = 2200, _1015pm = 2215, _1030pm = 2230, _1045pm = 2245,
 		_1100pm = 2300, _1115pm = 2315, _1130pm = 2330, _1145pm = 2345,
 	};
-
 	std::string test;
-
 private:
 	std::string name;
 	std::string section;
 	std::string room;
 	std::string professor;
-
 public:
 	DayAndTimeCombo inputTimeToCorrespondingDays(DayOfWeek& Days, Time& timeStart, Time& timeEnd);
 	Entry();
 	~Entry();
 };
+
+//-------------------------------------------------------------------------------------------------------------//
+// Taken from Loki Astari (https://stackoverflow.com/questions/1120140/how-can-i-read-and-parse-csv-files-in-c) 
+std::vector<std::string> getNextLineAndSplitIntoTokens(std::istream& str);
+
+class CSVRow
+{
+public:
+	std::string const& operator[](std::size_t index) const;
+	std::size_t size() const;
+	void readNextRow(std::istream& str);
+private:
+	std::vector<std::string>    m_data;
+};
+std::istream& operator>>(std::istream& str, CSVRow& data);
+
+class CSVIterator
+{
+public:
+	typedef std::input_iterator_tag     iterator_category;
+	typedef CSVRow                      value_type;
+	typedef std::size_t                 difference_type;
+	typedef CSVRow*                     pointer;
+	typedef CSVRow&                     reference;
+	CSVIterator(std::istream& str);
+	CSVIterator();
+	CSVIterator& operator++();
+	CSVIterator operator++(int);
+	CSVRow const& operator*()   const;
+	CSVRow const* operator->()  const;
+	bool operator==(CSVIterator const& rhs);
+	bool operator!=(CSVIterator const& rhs);
+private:
+	std::istream*       m_str;
+	CSVRow              m_row;
+};
+
+//-------------------------------------------------------------------------------------------------------------//
